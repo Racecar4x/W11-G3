@@ -10,37 +10,48 @@ const SQLTerminal: React.FC = () => {
   const resultsEndRef = useRef<HTMLDivElement>(null);
 
   const [lastAction, setLastAction] = useState<string | null>(null);
+  const [hasRun, setHasRun] = useState(false);
 
   const interpretAndRun = () => {
-    let q = query.trim().toLowerCase();
+    const q = query.trim().toLowerCase();
     let sql = query;
 
-    // Enhanced Natural Language Interpretations
-    if (q.startsWith('create user ')) {
-      // Handle "create user user one" -> name: "user one"
-      const name = query.toLowerCase().replace('create user ', '').trim();
-      sql = `INSERT INTO users (name, email) VALUES ('${name}', '${name.replace(/\s+/g, '')}@windows11.local');`;
-    } else if (q.startsWith('delete user ')) {
-      const name = query.substring(12).trim();
+    console.log("Interpreting query:", q);
+
+    if (q.includes('create') && q.includes('user')) {
+      const parts = query.split(/\s+/);
+      const name = parts.length > 2 ? parts.slice(2).join(' ') : 'New User';
+      sql = `INSERT INTO users (name, email) VALUES ('${name}', '${name.toLowerCase().replace(/\s+/g, '')}@windows11.local');`;
+    } else if (q.includes('delete') && q.includes('user')) {
+      const parts = query.split(/\s+/);
+      const name = parts.length > 2 ? parts.slice(2).join(' ') : '';
       sql = `DELETE FROM users WHERE name = '${name}';`;
-    } else if (q.includes('show') && q.includes('user')) {
+    } else if ((q.includes('show') || q.includes('list')) && q.includes('user')) {
       sql = `SELECT * FROM users;`;
-    } else if (q.includes('show') && q.includes('file')) {
+    } else if ((q.includes('show') || q.includes('list')) && q.includes('file')) {
       sql = `SELECT * FROM files;`;
-    } else if (q.startsWith('create file ')) {
-      const name = query.substring(12).trim();
+    } else if (q.includes('create') && q.includes('file')) {
+      const parts = query.split(/\s+/);
+      const name = parts.length > 2 ? parts.slice(2).join(' ') : 'newfile.txt';
       sql = `INSERT INTO files (name, content, type, parentId, size) VALUES ('${name}', 'New file content', 'text', 'Documents', '0 KB');`;
-    } else if (q.startsWith('delete file ')) {
-      const name = query.substring(12).trim();
+    } else if (q.includes('delete') && q.includes('file')) {
+      const parts = query.split(/\s+/);
+      const name = parts.length > 2 ? parts.slice(2).join(' ') : '';
       sql = `DELETE FROM files WHERE name = '${name}';`;
     } else if (q.includes('destroy') || q.includes('kill') || q.includes('crash')) {
       sql = `DELETE FROM registry WHERE key = 'ServiceManager';`;
+      // Trigger actual BSOD for effect
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('system:bsod', {
+          detail: { code: 'CRITICAL_SYSTEM_PROCESS_TERMINATED', message: 'The SQL process killed a critical system component.' }
+        }));
+      }, 1000);
     } else if (q.includes('recovery') || q.includes('repair')) {
       window.dispatchEvent(new CustomEvent('system:recovery'));
       return;
     } else if (q.includes('reset')) {
-       // Logic to trigger reset
-       sql = "DELETE FROM users; DELETE FROM files; DELETE FROM system_state;";
+      sql = "DELETE FROM users; DELETE FROM files; DELETE FROM system_state;";
+      setLastAction('System state cleared. Restart required.');
     }
 
     executeSQL(sql);
@@ -50,15 +61,21 @@ const SQLTerminal: React.FC = () => {
     const finalQuery = sqlOverride || query;
     try {
       setError(null);
+      setHasRun(true);
       const res = runQuery(finalQuery);
-      setResults(res);
-      setHistory(prev => [finalQuery, ...prev].slice(0, 10));
-      
+
       const mutationKeywords = ['INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP', 'REPLACE'];
-      if (mutationKeywords.some(keyword => finalQuery.toUpperCase().includes(keyword))) {
-        setLastAction('Database updated and saved to local storage.');
+      const isMutation = mutationKeywords.some(keyword => finalQuery.toUpperCase().includes(keyword));
+
+      if (isMutation) {
+        setResults([]); // Clear results on mutations to avoid confusion
+        setLastAction('Command executed successfully.');
         setTimeout(() => setLastAction(null), 3000);
+      } else {
+        setResults(res);
       }
+
+      setHistory((prev: string[]) => [finalQuery, ...prev].slice(0, 10));
     } catch (err: any) {
       setError(err.message || 'An error occurred during query execution.');
       setResults([]);
@@ -72,6 +89,7 @@ const SQLTerminal: React.FC = () => {
   const clearResults = () => {
     setResults([]);
     setError(null);
+    setHasRun(false);
   };
 
   useEffect(() => {
@@ -87,21 +105,21 @@ const SQLTerminal: React.FC = () => {
           <span className="text-xs font-semibold text-gray-400">SQL Server (SQLite3 in-browser)</span>
         </div>
         <div className="flex items-center gap-4">
-          <button 
+          <button
             onClick={() => interpretAndRun()}
             className="flex items-center gap-1.5 px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs transition-colors"
           >
             <Play className="w-3 h-3" />
             <span>Interpret & Run</span>
           </button>
-          <button 
+          <button
             onClick={enterRecovery}
             className="flex items-center gap-1.5 px-3 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded text-xs transition-colors"
           >
             <AlertCircle className="w-3 h-3" />
             <span>Mode: Recovery</span>
           </button>
-          <button 
+          <button
             onClick={clearResults}
             className="p-1 hover:bg-white/10 rounded transition-colors"
             title="Clear Results"
@@ -120,7 +138,7 @@ const SQLTerminal: React.FC = () => {
         </div>
         <textarea
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setQuery(e.target.value)}
           className="flex-1 bg-transparent p-2 outline-none resize-none text-blue-300"
           placeholder="Enter SQL here..."
           spellCheck={false}
@@ -171,7 +189,14 @@ const SQLTerminal: React.FC = () => {
             </table>
             <p className="mt-2 text-[10px] text-gray-500">{results.length} rows returned</p>
           </div>
-        ) : !error && (
+        ) : hasRun ? (
+          <div className="h-full flex flex-col items-center justify-center text-gray-500">
+            {!error && <div className="flex flex-col items-center gap-2">
+              <span className="text-green-500 font-bold">✓ Success</span>
+              <span className="text-xs">Query executed, 0 rows returned.</span>
+            </div>}
+          </div>
+        ) : (
           <div className="h-full flex flex-col items-center justify-center opacity-30">
             <Terminal className="w-12 h-12 mb-2" />
             <span>Ready for query execution</span>
