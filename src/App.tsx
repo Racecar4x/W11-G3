@@ -17,6 +17,7 @@ import RecoveryMode from './components/RecoveryMode';
 import Installer from './components/Installer';
 import OOBE from './components/OOBE';
 import ResetApp from './components/ResetApp';
+import MicrosoftStore from './components/MicrosoftStore';
 import { db } from './lib/db';
 
 type AppId = 'explorer' | 'notepad' | 'calculator' | 'edge' | 'recycle' | 'settings' | 'word' | 'excel' | 'powerpoint' | 'mail' | 'calendar' | 'store' | 'photos' | 'sql' | 'cmd' | 'registry' | 'reset' | 'build';
@@ -40,7 +41,8 @@ import {
   Terminal as CmdIcon,
   ShieldCheck,
   RefreshCcw,
-  Zap
+  Zap,
+  ShoppingBag
 } from 'lucide-react';
 
 import PCBuilderApp from './components/PCBuilderApp';
@@ -95,6 +97,11 @@ const APP_METADATA: Record<string, { title: string; icon: string | React.ReactNo
     title: 'Reset this PC',
     icon: <RefreshCcw className="w-5 h-5 text-red-500" />,
     content: <ResetApp />,
+  },
+  store: {
+    title: 'Microsoft Store',
+    icon: <ShoppingBag className="w-5 h-5 text-blue-500 fill-blue-500/20" />,
+    content: <MicrosoftStore />,
   },
 };
 

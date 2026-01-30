@@ -115,6 +115,43 @@ const OOBE: React.FC<OOBEProps> = ({ onComplete }) => {
               className="flex w-full h-full"
             >
               <div className="w-1/2 p-16 flex flex-col items-center justify-center bg-blue-50/30">
+                <div className="w-32 h-32 text-blue-600 mb-8 flex items-center justify-center border-4 border-dashed border-blue-200 rounded-full">
+                  <Globe className="w-16 h-16 animate-pulse" />
+                </div>
+                <h1 className="text-xl font-medium text-gray-700 text-center">Let's connect you to a network.</h1>
+              </div>
+              <div className="w-1/2 p-16 flex flex-col text-gray-900">
+                <h2 className="text-2xl font-light mb-4">Connecting to the internet</h2>
+                <p className="text-sm text-gray-500 mb-8">You'll need an internet connection to continue setting up your device. This helps us get the latest updates and features.</p>
+                <div className="flex-1 flex flex-col items-center justify-center gap-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                  <div className="text-gray-400 text-sm">No networks found</div>
+                  <button className="text-blue-600 text-xs hover:underline">Retry</button>
+                </div>
+                <div className="mt-8 flex justify-between items-center">
+                  <button
+                    onClick={() => setStep(3)}
+                    className="text-xs text-gray-500 hover:text-blue-600 font-semibold"
+                  >
+                    I don't have internet
+                  </button>
+                  <div className="flex gap-4">
+                    <button onClick={() => setStep(1)} className="text-gray-500 hover:text-gray-900 text-sm font-medium">Back</button>
+                    <button disabled className="bg-gray-300 text-gray-500 px-10 py-2 rounded shadow-lg cursor-not-allowed text-sm">Next</button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {step === 3 && (
+            <motion.div
+              key="step3"
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+              className="flex w-full h-full"
+            >
+              <div className="w-1/2 p-16 flex flex-col items-center justify-center bg-blue-50/30">
                 <User className="w-32 h-32 text-blue-600 mb-8" />
                 <h1 className="text-xl font-medium text-gray-700 text-center">Naming your PC.</h1>
               </div>
@@ -129,15 +166,15 @@ const OOBE: React.FC<OOBEProps> = ({ onComplete }) => {
                   value={username}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
                 />
-                <div className="mt-auto flex justify-end gap-4">
-                  <button onClick={() => setStep(1)} className="text-gray-500 hover:text-gray-900">Back</button>
-                  <button onClick={() => setStep(3)} className="bg-blue-600 text-white px-10 py-2 rounded shadow-lg">Next</button>
+                <div className="mt-auto flex justify-end gap-4 text-sm font-medium">
+                  <button onClick={() => setStep(2)} className="text-gray-500 hover:text-gray-900">Back</button>
+                  <button onClick={() => setStep(4)} className="bg-blue-600 text-white px-10 py-2 rounded shadow-lg">Next</button>
                 </div>
               </div>
             </motion.div>
           )}
 
-          {step === 3 && (
+          {step === 4 && (
             <motion.div
               key="step3"
               initial={{ opacity: 0, x: 50 }}

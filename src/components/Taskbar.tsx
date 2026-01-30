@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { 
-  Search, 
-  ChevronUp, 
-  Wifi, 
-  Volume2, 
+import {
+  Search,
+  ChevronUp,
+  Wifi,
+  Volume2,
   Battery,
   Folder,
   Globe,
@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   Database,
   LayoutGrid,
+  ShoppingBag,
   Settings as SettingsIcon
 } from 'lucide-react';
 import { cn } from '../utils/cn';
@@ -35,11 +36,11 @@ interface TaskbarProps {
   alignment?: 'center' | 'left';
 }
 
-const Taskbar: React.FC<TaskbarProps> = ({ 
-  onStartClick, 
-  onTrayClick, 
-  openApps, 
-  activeApp, 
+const Taskbar: React.FC<TaskbarProps> = ({
+  onStartClick,
+  onTrayClick,
+  openApps,
+  activeApp,
   onAppClick,
   alignment = 'center'
 }) => {
@@ -52,9 +53,10 @@ const Taskbar: React.FC<TaskbarProps> = ({
 
   const apps = [
     { id: 'start', icon: <LayoutGrid className="w-6 h-6 text-blue-600 fill-blue-600" />, action: onStartClick },
-    { id: 'search', icon: <Search className="w-5 h-5 text-sky-600" />, action: () => {} },
+    { id: 'search', icon: <Search className="w-5 h-5 text-sky-600" />, action: () => { } },
     { id: 'explorer', icon: <Folder className="w-6 h-6 text-yellow-500 fill-yellow-500" />, action: () => onAppClick('explorer') },
     { id: 'edge', icon: <Globe className="w-6 h-6 text-sky-500" />, action: () => onAppClick('edge') },
+    { id: 'store', icon: <ShoppingBag className="w-6 h-6 text-blue-500 fill-blue-500" />, action: () => onAppClick('store') },
     { id: 'notepad', icon: <FileText className="w-6 h-6 text-blue-500" />, action: () => onAppClick('notepad') },
     { id: 'calculator', icon: <Calculator className="w-6 h-6 text-blue-600" />, action: () => onAppClick('calculator') },
     { id: 'cmd', icon: <Terminal className="w-6 h-6 text-gray-800" />, action: () => onAppClick('cmd') },
@@ -66,12 +68,12 @@ const Taskbar: React.FC<TaskbarProps> = ({
   return (
     <div className="fixed bottom-0 left-0 right-0 h-12 bg-white/80 backdrop-blur-xl border-t border-white/20 flex items-center justify-between px-3 z-[1000] select-none">
       <div className={cn(alignment === 'center' ? "flex-1" : "hidden")} />
-      
+
       <div className={cn("flex items-center gap-1", alignment === 'left' && "flex-1 justify-start")}>
         {apps.map((app) => {
           const isOpen = openApps.includes(app.id);
           const isActive = activeApp === app.id;
-          
+
           return (
             <div
               key={app.id}
@@ -97,8 +99,8 @@ const Taskbar: React.FC<TaskbarProps> = ({
         <div className="hover:bg-white/50 rounded p-1.5 transition-colors cursor-default">
           <ChevronUp className="w-4 h-4" />
         </div>
-        
-        <div 
+
+        <div
           onClick={onTrayClick}
           className="flex items-center gap-2 hover:bg-white/50 rounded px-2 py-1 transition-colors cursor-default group"
         >

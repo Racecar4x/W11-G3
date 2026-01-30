@@ -40,7 +40,9 @@ import {
   Settings as SettingsIcon,
   Database,
   RefreshCcw,
-  Zap
+  Zap,
+  Globe,
+  ShoppingBag
 } from 'lucide-react';
 
 const Desktop: React.FC<DesktopProps> = ({ children, onIconDoubleClick, onDesktopClick }) => {
@@ -53,6 +55,8 @@ const Desktop: React.FC<DesktopProps> = ({ children, onIconDoubleClick, onDeskto
     { id: 'notepad', label: 'Notepad', icon: <FileText className="w-8 h-8 text-blue-300" /> },
     { id: 'calculator', label: 'Calculator', icon: <Calculator className="w-8 h-8 text-blue-600" /> },
     { id: 'settings', label: 'Settings', icon: <SettingsIcon className="w-8 h-8 text-gray-500" /> },
+    { id: 'store', label: 'Microsoft Store', icon: <ShoppingBag className="w-8 h-8 text-blue-500" /> },
+    { id: 'edge', label: 'Microsoft Edge', icon: <Globe className="w-8 h-8 text-sky-500" /> },
     { id: 'build', label: 'PC Builder', icon: <Zap className="w-8 h-8 text-amber-500" /> },
     { id: 'reset', label: 'Reset PC', icon: <RefreshCcw className="w-8 h-8 text-red-500" /> },
   ];
